@@ -1,5 +1,3 @@
-package com.protocipher;
-
 import java.security.NoSuchAlgorithmException;
 import java.security.KeyManagementException;
 import java.util.Arrays;
