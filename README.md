@@ -1,4 +1,4 @@
-# GetCiphers.java
+# getCiphers-java
 Get supported protocols and ciphers from java
 
 Simple code that lists the supported protocols and ciphers because in newer java versions the following code does not work anymore:
