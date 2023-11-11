@@ -1,31 +1,59 @@
 import java.security.NoSuchAlgorithmException;
 import java.security.KeyManagementException;
+import javax.net.ssl.SSLContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.net.ssl.SSLContext;
+
+class SSLContextWrapper implements AutoCloseable {
+    private final SSLContext sslContext;
+
+    public SSLContextWrapper(String protocol) throws NoSuchAlgorithmException, KeyManagementException {
+        this.sslContext = SSLContext.getInstance(protocol);
+        this.sslContext.init(null, null, null);
+    }
+
+    public SSLContext getSSLContext() {
+        return sslContext;
+    }
+
+    @Override
+    public void close() throws Exception {
+        // You might want to add cleanup logic here if needed
+    }
+}
 
 public class getCiphers {
-  public static void main(String[] args) throws NoSuchAlgorithmException, KeyManagementException {
+    public static void main(String[] args) {
+        try {
+            // Use try-with-resources with SSLContextWrapper
+            try (final SSLContextWrapper sslContextWrapper = new SSLContextWrapper("TLS")) {
+                final SSLContext sslContext = sslContextWrapper.getSSLContext();
 
-    final SSLContext sslContext = SSLContext.getInstance("TLS");
-    sslContext.init(null, null, null);
-    final List < String > supportedProtocols = Arrays.asList(sslContext.getSupportedSSLParameters().getProtocols());
-    final List < String > supportedCipherSuites = Arrays.asList(sslContext.getSupportedSSLParameters().getCipherSuites());
+                // Rest of your code for retrieving and printing protocols and ciphers
+                final List<String> supportedProtocols = Arrays.asList(sslContext.getSupportedSSLParameters().getProtocols());
+                final List<String> supportedCipherSuites = Arrays.asList(sslContext.getSupportedSSLParameters().getCipherSuites());
 
-    Collections.sort(supportedProtocols);
-    Collections.sort(supportedCipherSuites);
+                Collections.sort(supportedProtocols);
+                Collections.sort(supportedCipherSuites);
 
-    System.out.println("Protocols:");
-    for (String Protocols: supportedProtocols) {
-      System.out.println(Protocols);
+                System.out.println("Supported TLS Protocols:");
+                for (String protocol : supportedProtocols) {
+                    System.out.println(protocol);
+                }
+
+                System.out.println();
+
+                System.out.println("Supported Cipher Suites:");
+                for (String cipher : supportedCipherSuites) {
+                    System.out.println(cipher);
+                }
+            }
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            // Handle exceptions, maybe print an error message
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-    System.out.println();
-
-    System.out.println("Ciphers:");
-    for (String Ciphers: supportedCipherSuites) {
-      System.out.println(Ciphers);
-    }
-  }
 }
